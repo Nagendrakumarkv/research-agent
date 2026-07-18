@@ -39,18 +39,12 @@ Do not invent tool results.
 
 
 class ResearchEngine:
-    """
-    Executes the ReAct loop.
-    """
 
     def __init__(self):
 
         self.memory = Memory()
 
-    def _call_model(self) -> str:
-        """
-        Send conversation history to Gemini.
-        """
+    def _call_model(self):
 
         response = client.models.generate_content(
             model=MODEL_NAME,
@@ -64,12 +58,9 @@ class ResearchEngine:
 
     def _execute_tool(
         self,
-        tool_name: str,
-        tool_input: str
-    ) -> str:
-        """
-        Execute the requested tool.
-        """
+        tool_name,
+        tool_input
+    ):
 
         if tool_name == "web_search":
             return web_search(tool_input)
@@ -81,11 +72,8 @@ class ResearchEngine:
 
     def run(
         self,
-        research_goal: str
-    ) -> str:
-        """
-        Execute the complete ReAct loop.
-        """
+        research_goal
+    ):
 
         self.memory.clear()
 
@@ -98,9 +86,9 @@ class ResearchEngine:
             model_output = self._call_model()
 
             print("\n")
-            print("=" * 60)
+            print("=" * 70)
             print(model_output)
-            print("=" * 60)
+            print("=" * 70)
 
             self.memory.add_model_message(
                 model_output
@@ -109,6 +97,7 @@ class ResearchEngine:
             if model_output.startswith(
                 "FINAL ANSWER:"
             ):
+
                 return model_output.replace(
                     "FINAL ANSWER:",
                     ""
@@ -122,28 +111,25 @@ class ResearchEngine:
             for index, line in enumerate(lines):
 
                 if line.startswith("ACTION:"):
-                    tool_name = (
-                        lines[index + 1].strip()
-                    )
+                    tool_name = lines[index + 1].strip()
 
                 if line.startswith("INPUT:"):
-                    tool_input = (
-                        lines[index + 1].strip()
-                    )
+                    tool_input = lines[index + 1].strip()
 
             observation = self._execute_tool(
                 tool_name,
                 tool_input
             )
 
-            print("\nTOOL RESULT\n")
+            print("\nTOOL RESULT")
+            print("-" * 70)
             print(observation)
+            print("-" * 70)
 
             self.memory.add_tool_message(
                 observation
             )
 
         return (
-            "Maximum iterations reached without "
-            "producing a final answer."
+            "Maximum iterations reached."
         )
