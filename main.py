@@ -1,40 +1,38 @@
-from tools.web_search import web_search
-from tools.calculator import calculate
-from tools.file_system import save_report
+from agent.memory import Memory
 
 
 def main():
 
-    print("=" * 60)
-    print("WEB SEARCH")
-    print("=" * 60)
+    memory = Memory()
 
-    print(
-        web_search("Artificial Intelligence")
+    memory.add_user_message(
+        "Research Artificial Intelligence."
     )
 
-    print()
-
-    print("=" * 60)
-    print("CALCULATOR")
-    print("=" * 60)
-
-    print(
-        calculate("(45 + 55) * 10")
+    memory.add_model_message(
+        "I should search Wikipedia."
     )
 
-    print()
-
-    print("=" * 60)
-    print("FILE SYSTEM")
-    print("=" * 60)
-
-    print(
-        save_report(
-            "sample_report",
-            "# Hello\n\nThis is my first report."
-        )
+    memory.add_tool_message(
+        "Artificial intelligence (AI) is the simulation of human intelligence by machines."
     )
+
+    memory.add_model_message(
+        "Now I have enough information."
+    )
+
+    history = memory.get_history()
+
+    print("=" * 60)
+    print(f"History contains {len(history)} messages.")
+    print("=" * 60)
+
+    for index, content in enumerate(history, start=1):
+        print(f"\nMessage {index}")
+        print(f"Role: {content.role}")
+
+        for part in content.parts:
+            print(part.text)
 
 
 if __name__ == "__main__":
